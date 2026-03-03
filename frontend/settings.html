@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>DEW MD - Settings</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+  :root {
+    --bg-color: #121212;
+    --card-bg: #1c1c1c;
+    --text-primary: #e0e0e0;
+    --text-secondary: #9e9e9e;
+    --accent-color: #00ffea;
+    --accent-hover: #00e6d2;
+    --input-bg: #121212;
+    --border-color: rgba(0, 255, 234, 0.2);
+    --shadow-color: rgba(0, 255, 234, 0.1);
+    --error-color: #ff6b6b;
+  }
+
+  body.light-theme {
+      --bg-color: #f3f4f6;
+      --card-bg: #ffffff;
+      --text-primary: #1f2937;
+      --text-secondary: #6b7280;
+      --accent-color: #0d9488;
+      --accent-hover: #0f766e;
+      --input-bg: #f9fafb;
+      --border-color: rgba(13, 148, 136, 0.2);
+      --shadow-color: rgba(13, 148, 136, 0.1);
+      --error-color: #ef4444;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; }
+  
+  body { 
+    margin:0; padding:0;
+    font-family: 'Inter', sans-serif;
+    background: var(--bg-color);
+    color: var(--text-primary);
+    display: flex; 
+    justify-content: center; 
+    align-items: center; 
+    min-height: 100vh;
+    overflow: hidden;
+    transition: background-color 0.3s ease, color 0.3s ease;
+  }
+
+  #gradient-canvas {
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    z-index: -1; filter: blur(80px); opacity: 0.6;
+  }
+
+  .card {
+    position: relative; z-index:1;
+    background: var(--card-bg);
+    padding: 2.5rem 2rem;
+    border-radius: 24px;
+    width: 90%; max-width: 500px;
+    text-align: center;
+    box-shadow: 0 20px 40px -10px var(--shadow-color);
+    border: 1px solid var(--border-color);
+    backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+    max-height: 90vh; overflow-y: auto;
+  }
+  .card:hover { transform: translateY(-5px); }
+
+  h1 { color: var(--accent-color); font-size: 2rem; margin: 0 0 1.5rem 0; font-weight: 800; letter-spacing: -0.025em; }
+  
+  .form-group { margin-bottom: 1.5rem; text-align: left; }
+  label { display: block; margin-bottom: 0.5rem; color: var(--text-secondary); font-weight: 500; font-size: 0.9rem; }
+  
+  select, input {
+    width: 100%; padding: 1rem 1.25rem;
+    border-radius: 12px; border: 2px solid var(--border-color);
+    background: var(--input-bg); color: var(--text-primary);
+    font-size: 1rem; outline: none; transition: all 0.2s ease; font-family: inherit;
+  }
+  select { appearance: none; cursor: pointer; }
+  select:focus, input:focus { border-color: var(--accent-color); box-shadow: 0 0 0 4px var(--shadow-color); }
+  option { background: var(--card-bg); color: var(--text-primary); }
+
+  button {
+    width: 100%; padding: 1rem; border: none;
+    background: var(--accent-color); color: var(--bg-color);
+    font-weight: 700; font-size: 1rem; border-radius: 12px;
+    cursor: pointer; transition: all 0.2s ease;
+    display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem;
+    text-transform: uppercase; letter-spacing: 0.05em; margin-top: 1rem;
+  }
+  button:hover { background: var(--accent-hover); transform: translateY(-1px); box-shadow: 0 4px 12px var(--shadow-color); }
+  
+  .btn-logout { background: var(--error-color); color: white; }
+  .btn-logout:hover { background: #d32f2f; }
+
+  .theme-toggle, .music-toggle {
+    position: absolute; top: 20px;
+    background: var(--card-bg); border: 1px solid var(--border-color);
+    color: var(--text-primary); width: 45px; height: 45px;
+    border-radius: 50%; display: flex; align-items: center; justify-content: center;
+    cursor: pointer; box-shadow: 0 4px 12px var(--shadow-color);
+    z-index: 100; font-size: 1.2rem; padding: 0; transition: all 0.2s ease;
+  }
+  .theme-toggle { right: 20px; }
+  .music-toggle { right: 80px; }
+  .theme-toggle:hover, .music-toggle:hover { transform: translateY(-2px); color: var(--accent-color); background: var(--card-bg); }
+
+  @media (max-width: 600px) {
+      .card {
+          padding: 1.5rem;
+          width: 95%;
+          max-height: 85vh;
+      }
+      h1 {
+          font-size: 1.75rem;
+      }
+      .theme-toggle, .music-toggle {
+          width: 40px;
+          height: 40px;
+          font-size: 1rem;
+          top: 15px;
+      }
+      .theme-toggle { right: 15px; }
+      .music-toggle { right: 65px; }
+  }
+
+  /* Toast Notifications */
+  .toast-container { position: fixed; top: 20px; right: 20px; z-index: 10000; display: flex; flex-direction: column; gap: 10px; }
+  .toast { background: var(--card-bg); color: var(--text-primary); border: 1px solid var(--border-color); padding: 12px 20px; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); display: flex; align-items: center; gap: 12px; min-width: 280px; animation: slideIn 0.3s cubic-bezier(0.68, -0.55, 0.27, 1.55); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); }
+  .toast.hiding { animation: fadeOut 0.3s ease forwards; }
+  .toast i { font-size: 1.2rem; }
+  .toast.success i { color: var(--accent-color); }
+  .toast.error i { color: var(--error-color); }
+  .toast.info i { color: var(--text-secondary); }
+  @keyframes slideIn { from { transform: translateX(120%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+  @keyframes fadeOut { to { opacity: 0; transform: translateX(20px); } }
+</style>
+</head>
+<body>
+
+<button class="music-toggle" id="music-toggle" aria-label="Toggle Music">
+  <i class="fas fa-music"></i>
+</button>
+<audio id="bg-music" loop></audio>
+
+<button class="theme-toggle" id="theme-toggle" aria-label="Toggle Theme">
+  <i class="fas fa-moon"></i>
+</button>
+
+<div class="card">
+  <h1>Bot Settings</h1>
+  <div id="loading" style="text-align: center; color:var(--text-secondary);"><h4>Loading configuration...</h4></div>
+  <div id="settingsForm" style="display: none;">
+      <div class="form-group">
+          <label>Work Type</label>
+          <select id="WORK_TYPE">
+              <option value="public">Public</option>
+              <option value="private">Private</option>
+              <option value="groups">Groups Only</option>
+              <option value="inbox">Inbox Only</option>
+          </select>
+      </div>
+      <div class="form-group">
+          <label>Auto Read Status</label>
+          <select id="AUTO_VIEW_STATUS">
+              <option value="true">Enabled</option>
+              <option value="false">Disabled</option>
+          </select>
+      </div>
+      <div class="form-group">
+          <label>Auto Like Status</label>
+          <select id="AUTO_LIKE_STATUS">
+              <option value="true">Enabled</option>
+              <option value="false">Disabled</option>
+          </select>
+      </div>
+      <div class="form-group">
+          <label>Auto Recording</label>
+          <select id="AUTO_RECORDING">
+              <option value="true">Enabled</option>
+              <option value="false">Disabled</option>
+          </select>
+      </div>
+      <div class="form-group">
+          <label>Auto Typing</label>
+          <select id="AUTO_TYPING">
+              <option value="true">Enabled</option>
+              <option value="false">Disabled</option>
+          </select>
+      </div>
+       <div class="form-group">
+          <label>Bot Presence</label>
+          <select id="PRESENCE">
+              <option value="online">Online</option>
+              <option value="unavailable">Offline</option>
+          </select>
+      </div>
+      <div class="form-group">
+          <label>Anti Delete</label>
+          <select id="ANTI_DELETE">
+              <option value="true">Enabled</option>
+              <option value="false">Disabled</option>
+          </select>
+      </div>
+      <div class="form-group">
+          <label>Anti Delete Type</label>
+          <select id="ANTI_DELETE_TYPE">
+              <option value="me">Send to Owner (Me)</option>
+              <option value="same">Send to Chat (Same)</option>
+          </select>
+      </div>
+      <div class="form-group">
+          <label>Anti Call</label>
+          <select id="ANTI_CALL">
+              <option value="on">Enabled</option>
+              <option value="off">Disabled</option>
+          </select>
+      </div>
+      <div class="form-group">
+          <label>Auto Read Messages</label>
+          <select id="AUTO_READ_MESSAGE">
+              <option value="off">Disabled</option>
+              <option value="all">Read All</option>
+              <option value="cmd">Read Commands Only</option>
+          </select>
+      </div>
+      <div class="form-group">
+          <label>Prefix</label>
+          <input type="text" id="PREFIX" placeholder="." />
+      </div>
+      <div class="form-group">
+          <label>Auto Like Emojis (Space separated)</label>
+          <input type="text" id="AUTO_LIKE_EMOJI" placeholder="❤️ 🔥 👍" />
+      </div>
+      <button onclick="saveSettings()"><i class="fas fa-save"></i> Save Settings</button>
+      <button class="btn-logout" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</button>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.0.0-alpha.1/axios.min.js"></script>
+<script>
+    // Music & Theme Logic
+    const musicBtn = document.getElementById("music-toggle");
+    const audio = document.getElementById("bg-music");
+    const themeToggle = document.getElementById("theme-toggle");
+    const body = document.body;
+    const icon = themeToggle.querySelector("i");
+
+    async function initMusic() {
+        musicBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+        try {
+        const { data } = await axios.get("https://api.srihub.store/api/music");
+        if (data.success && data.result && data.result.url) {
+            audio.src = data.result.url;
+            try { await audio.play(); musicBtn.innerHTML = '<i class="fas fa-volume-up"></i>'; } 
+            catch (err) { musicBtn.innerHTML = '<i class="fas fa-volume-mute"></i>'; }
+        } else { musicBtn.innerHTML = '<i class="fas fa-volume-mute"></i>'; }
+        } catch (e) { musicBtn.innerHTML = '<i class="fas fa-volume-mute"></i>'; }
+    }
+    
+    musicBtn.addEventListener("click", () => {
+        if (audio.paused) { audio.play(); musicBtn.innerHTML = '<i class="fas fa-volume-up"></i>'; } 
+        else { audio.pause(); musicBtn.innerHTML = '<i class="fas fa-volume-mute"></i>'; }
+    });
+    initMusic();
+
+    const savedTheme = localStorage.getItem("theme");
+    const systemPrefersLight = window.matchMedia("(prefers-color-scheme: light)").matches;
+    if (savedTheme === "light" || (!savedTheme && systemPrefersLight)) {
+        body.classList.add("light-theme");
+        icon.className = "fas fa-sun";
+    }
+
+    themeToggle.addEventListener("click", () => {
+        body.classList.toggle("light-theme");
+        const isLight = body.classList.contains("light-theme");
+        icon.className = isLight ? "fas fa-sun" : "fas fa-moon";
+        localStorage.setItem("theme", isLight ? "light" : "dark");
+        if (window.updateBackgroundTheme) window.updateBackgroundTheme(isLight);
+    });
+
+    // Background Animation
+    (function(){const canvas=document.createElement('canvas');canvas.id='gradient-canvas';document.body.insertBefore(canvas,document.body.firstChild);const ctx=canvas.getContext('2d');let width,height;let particles=[];let mouse={x:window.innerWidth/2,y:window.innerHeight/2};window.addEventListener('mousemove',e=>{mouse.x=e.clientX;mouse.y=e.clientY});const darkColors=['#00ffea','#7928ca','#ff0080','#4286f4','#00d2ff'];const lightColors=['#ff9a9e','#fad0c4','#a18cd1','#fbc2eb','#8fd3f4','#4facfe'];let colors=document.body.classList.contains('light-theme')?lightColors:darkColors;class Particle{constructor(){this.reset()}reset(){this.x=Math.random()*width;this.y=Math.random()*height;this.vx=(Math.random()-0.5)*2;this.vy=(Math.random()-0.5)*2;this.radius=Math.random()*200+150;this.color=colors[Math.floor(Math.random()*colors.length)]}update(){this.x+=this.vx;this.y+=this.vy;if(this.x<-200||this.x>width+200)this.vx*=-1;if(this.y<-200||this.y>height+200)this.vy*=-1;const dx=mouse.x-this.x;const dy=mouse.y-this.y;this.x+=dx*0.02;this.y+=dy*0.02}draw(){ctx.beginPath();ctx.arc(this.x,this.y,this.radius,0,Math.PI*2);ctx.fillStyle=this.color;ctx.fill()}}function resize(){width=window.innerWidth;height=window.innerHeight;canvas.width=width;canvas.height=height;particles=[];for(let i=0;i<6;i++)particles.push(new Particle())}function animate(){ctx.clearRect(0,0,width,height);particles.forEach(p=>{p.update();p.draw()});requestAnimationFrame(animate)}window.addEventListener('resize',resize);resize();animate();window.updateBackgroundTheme=function(isLight){colors=isLight?lightColors:darkColors;particles.forEach(p=>p.color=colors[Math.floor(Math.random()*colors.length)])}})();
+    // Snow Effect
+    (function(){const canvas=document.createElement('canvas');canvas.style.position='fixed';canvas.style.top='0';canvas.style.left='0';canvas.style.width='100%';canvas.style.height='100%';canvas.style.pointerEvents='none';canvas.style.zIndex='9999';document.body.appendChild(canvas);const ctx=canvas.getContext('2d');let width=window.innerWidth;let height=window.innerHeight;canvas.width=width;canvas.height=height;const snowflakes=Array.from({length:50},()=>({x:Math.random()*width,y:Math.random()*height,r:Math.random()*3+1,s:Math.random()*1+0.5}));function draw(){ctx.clearRect(0,0,width,height);ctx.fillStyle='rgba(255, 255, 255, 0.6)';snowflakes.forEach(f=>{ctx.beginPath();ctx.arc(f.x,f.y,f.r,0,Math.PI*2);ctx.fill();f.y+=f.s;f.x+=Math.sin(f.y*0.01)*0.5;if(f.y>height){f.y=-10;f.x=Math.random()*width}});requestAnimationFrame(draw)}window.addEventListener('resize',()=>{width=window.innerWidth;height=window.innerHeight;canvas.width=width;canvas.height=height});draw()})();
+
+    function showToast(message, type = 'info') {
+        const container = document.getElementById('toast-container') || createToastContainer();
+        const toast = document.createElement('div');
+        toast.className = `toast ${type}`;
+        const icon = type === 'success' ? 'fa-check-circle' : type === 'error' ? 'fa-exclamation-triangle' : 'fa-info-circle';
+        toast.innerHTML = `<i class="fas ${icon}"></i><span>${message}</span>`;
+        container.appendChild(toast);
+        setTimeout(() => { toast.classList.add('hiding'); setTimeout(() => toast.remove(), 300); }, 3000);
+    }
+
+    function createToastContainer() {
+        const container = document.createElement('div');
+        container.id = 'toast-container';
+        container.className = 'toast-container';
+        document.body.appendChild(container);
+        return container;
+    }
+
+    const number = localStorage.getItem('dew_number');
+    const password = localStorage.getItem('dew_password');
+
+    if (!number || !password) window.location.href = '/login';
+
+    async function loadSettings() {
+        try {
+            const res = await fetch(`/code/api/user-settings?number=${number}&password=${password}`);
+            const data = await res.json();
+            if (res.ok) {
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('settingsForm').style.display = 'block';
+                
+                const config = data.config;
+                const fields = ['WORK_TYPE', 'AUTO_VIEW_STATUS', 'AUTO_LIKE_STATUS', 'AUTO_RECORDING', 'AUTO_TYPING', 'PRESENCE'];
+                
+                fields.forEach(field => {
+                    if (document.getElementById(field)) {
+                        document.getElementById(field).value = config[field] || 'false';
+                    }
+                });
+            } else {
+                    showToast('Session expired or invalid credentials', 'error');
+                logout();
+            }
+        } catch (e) {
+                showToast('Error loading settings', 'error');
+        }
+    }
+
+    async function saveSettings() {
+        const config = {};
+        const fields = ['WORK_TYPE', 'AUTO_VIEW_STATUS', 'AUTO_LIKE_STATUS', 'AUTO_RECORDING', 'AUTO_TYPING', 'PRESENCE', 'ANTI_DELETE', 'ANTI_DELETE_TYPE', 'ANTI_CALL', 'AUTO_READ_MESSAGE', 'PREFIX', 'AUTO_LIKE_EMOJI'];
+        fields.forEach(field => {
+            const el = document.getElementById(field);
+            if (el) {
+                let val = el.value;
+                if (field === 'AUTO_LIKE_EMOJI') {
+                    val = val.split(/[\s,]+/).filter(Boolean);
+                }
+                config[field] = val;
+            }
+        });
+
+        try {
+            const res = await fetch('/code/api/user-settings', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ number, password, config })
+            });
+            const data = await res.json();
+            if (res.ok) {
+                showToast('Settings saved successfully!', 'success');
+            } else {
+                showToast(data.error || 'Failed to save', 'error');
+            }
+        } catch (e) {
+            showToast('Error saving settings', 'error');
+        }
+    }
+
+    function logout() {
+        localStorage.removeItem('dew_number');
+        localStorage.removeItem('dew_password');
+        window.location.href = '/login';
+    }
+
+    loadSettings();
+</script>
+</body>
+</html>

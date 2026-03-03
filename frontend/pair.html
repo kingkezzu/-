@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>KEZU TECH - Pair Code</title>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap');
+
+:root{
+  --gold-1:#FFD700;
+  --gold-2:#FFC107;
+  --gold-3:#FFB300;
+  --bg-main:#0f0f0f;
+  --card-bg:rgba(20,20,20,0.9);
+  --text-main:#ffffff;
+  --text-soft:#bfbfbf;
+  --border-gold:rgba(255,215,0,0.4);
+  --shadow-gold:rgba(255,215,0,0.25);
+}
+
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+}
+
+body{
+  font-family:'Poppins',sans-serif;
+  background: radial-gradient(circle at top right,#1a1a1a,#000 70%);
+  color:var(--text-main);
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  min-height:100vh;
+  overflow:hidden;
+}
+
+/* Golden Glow Background */
+body::before{
+  content:'';
+  position:fixed;
+  width:600px;
+  height:600px;
+  background:radial-gradient(circle,rgba(255,215,0,0.15),transparent 70%);
+  top:-200px;
+  right:-200px;
+  filter:blur(80px);
+  z-index:-1;
+}
+
+.card{
+  background:var(--card-bg);
+  backdrop-filter:blur(25px);
+  border:1px solid var(--border-gold);
+  box-shadow:0 20px 60px var(--shadow-gold);
+  border-radius:28px;
+  padding:3rem 2rem;
+  width:95%;
+  max-width:420px;
+  text-align:center;
+  transition:0.4s ease;
+}
+
+.card:hover{
+  transform:translateY(-8px);
+  box-shadow:0 30px 80px rgba(255,215,0,0.35);
+}
+
+h1{
+  font-size:2.3rem;
+  font-weight:800;
+  background:linear-gradient(45deg,var(--gold-1),var(--gold-3));
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+  margin-bottom:0.5rem;
+}
+
+h4{
+  font-weight:500;
+  color:var(--text-soft);
+  margin-bottom:2rem;
+  font-size:0.95rem;
+}
+
+.input-group{
+  margin-bottom:1.5rem;
+}
+
+input{
+  width:100%;
+  padding:1rem 1.2rem;
+  border-radius:14px;
+  border:1px solid var(--border-gold);
+  background:#111;
+  color:var(--gold-1);
+  font-size:1rem;
+  outline:none;
+  transition:0.3s ease;
+}
+
+input::placeholder{
+  color:#777;
+}
+
+input:focus{
+  border-color:var(--gold-1);
+  box-shadow:0 0 15px rgba(255,215,0,0.4);
+}
+
+button{
+  width:100%;
+  padding:1rem;
+  border:none;
+  border-radius:14px;
+  font-weight:700;
+  font-size:1rem;
+  cursor:pointer;
+  letter-spacing:1px;
+  background:linear-gradient(45deg,var(--gold-1),var(--gold-2));
+  color:#000;
+  transition:0.3s ease;
+  box-shadow:0 10px 25px rgba(255,215,0,0.3);
+}
+
+button:hover{
+  transform:translateY(-3px);
+  box-shadow:0 15px 35px rgba(255,215,0,0.5);
+}
+
+.code-container{
+  margin-top:1.5rem;
+  padding:1rem;
+  border-radius:12px;
+  border:1px dashed var(--gold-1);
+  background:#111;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  cursor:pointer;
+  transition:0.3s ease;
+}
+
+.code-container:hover{
+  background:#1a1a1a;
+}
+
+.code-text{
+  font-family:monospace;
+  font-size:1.1rem;
+  letter-spacing:2px;
+  color:var(--gold-1);
+  font-weight:600;
+}
+
+.footer{
+  margin-top:2rem;
+  font-size:0.8rem;
+  color:#aaa;
+}
+
+.footer a{
+  color:var(--gold-2);
+  text-decoration:none;
+  font-weight:600;
+}
+
+.footer a:hover{
+  text-decoration:underline;
+}
+</style>
+</head>
+
+<body>
+
+<div class="card">
+  <h1>KEZU TECH</h1>
+  <h4>Enter your WhatsApp number with country code</h4>
+
+  <div class="input-group">
+    <input type="number" id="number" placeholder="e.g. 9476xxxxxxx">
+  </div>
+
+  <button id="submit">
+    <i class="fas fa-key"></i> Generate Code
+  </button>
+
+  <div id="pair"></div>
+
+  <div class="footer">
+    © 2026 — Developed by <br>
+    <a href="#">KEZU TECH</a>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.0.0-alpha.1/axios.min.js"></script>
+
+<script>
+const input = document.getElementById("number");
+const button = document.getElementById("submit");
+const output = document.getElementById("pair");
+
+function showToast(msg){
+  alert(msg);
+}
+
+async function Copy(){
+  const code = document.querySelector(".code-text").innerText;
+  await navigator.clipboard.writeText(code);
+  showToast("Code Copied!");
+}
+
+button.addEventListener("click", async () => {
+  const raw = input.value.trim().replace(/[^0-9]/g,"");
+  if(!raw || raw.length < 11){
+    showToast("Invalid phone number");
+    return;
+  }
+
+  button.innerHTML = "Please wait...";
+  button.disabled = true;
+
+  try{
+    const { data } = await axios(`/code?number=${raw}`);
+    if(data.code){
+      output.innerHTML = `
+        <div class="code-container" onclick="Copy()">
+          <span class="code-text">${data.code}</span>
+          <i class="fas fa-copy"></i>
+        </div>
+      `;
+    }else{
+      showToast("Could not generate code");
+    }
+  }catch(e){
+    showToast("Server error");
+  }
+
+  button.innerHTML = '<i class="fas fa-key"></i> Generate Code';
+  button.disabled = false;
+});
+</script>
+
+</body>
+</html>

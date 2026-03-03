@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>BESTIE V1.5 - Luxury Edition</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700;800&family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+
+<style>
+  :root {
+    --gold: #FFD700;
+    --gold-dark: #C9A227;
+    --blue: #0A1F44;
+    --blue-light: #112B5E;
+    --card-bg: rgba(255, 255, 255, 0.05);
+  }
+
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  body {
+    font-family: 'Poppins', sans-serif;
+    background: linear-gradient(135deg, var(--blue), #000814);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    color: white;
+  }
+
+  .card {
+    background: var(--card-bg);
+    backdrop-filter: blur(25px);
+    border-radius: 25px;
+    padding: 3rem 2rem;
+    width: 90%;
+    max-width: 420px;
+    text-align: center;
+    border: 1px solid rgba(255, 215, 0, 0.3);
+    box-shadow: 0 0 40px rgba(255, 215, 0, 0.15);
+  }
+
+  h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: 2.5rem;
+    font-weight: 800;
+    background: linear-gradient(90deg, #FFD700, #ffffff, #FFD700);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 0.5rem;
+    letter-spacing: 2px;
+  }
+
+  h4 {
+    font-weight: 400;
+    margin-bottom: 2.5rem;
+    color: #d4d4d4;
+  }
+
+  .btn {
+    width: 100%;
+    padding: 1rem;
+    margin-bottom: 1.2rem;
+    border-radius: 15px;
+    font-weight: 600;
+    font-size: 1rem;
+    text-decoration: none;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    transition: 0.3s ease;
+  }
+
+  .btn-primary {
+    background: linear-gradient(45deg, var(--gold), var(--gold-dark));
+    color: var(--blue);
+    box-shadow: 0 5px 20px rgba(255, 215, 0, 0.4);
+  }
+
+  .btn-primary:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(255, 215, 0, 0.6);
+  }
+
+  .btn-secondary {
+    border: 2px solid var(--gold);
+    color: var(--gold);
+    background: transparent;
+  }
+
+  .btn-secondary:hover {
+    background: var(--gold);
+    color: var(--blue);
+    transform: translateY(-3px);
+  }
+
+  .footer {
+    margin-top: 2rem;
+    font-size: 0.85rem;
+    color: #cfcfcf;
+  }
+
+  .footer strong {
+    color: var(--gold);
+    letter-spacing: 1px;
+  }
+</style>
+</head>
+
+<body>
+
+<div class="card">
+  <h1>BESTIE V1.5</h1>
+  <h4>Luxury WhatsApp Bot Panel</h4>
+
+  <a href="/pair" class="btn btn-primary">
+    <i class="fas fa-qrcode"></i> Generate Pair Code
+  </a>
+
+  <a href="/login" class="btn btn-secondary">
+    <i class="fas fa-cog"></i> Bot Settings
+  </a>
+
+  <div class="footer">
+    © 2026 — Developed by <br>
+    <strong>KEZU TECH LABZ</strong>
+  </div>
+</div>
+
+</body>
+</html>

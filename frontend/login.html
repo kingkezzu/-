@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>DEW MD - Luxury Login</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+
+<style>
+:root{
+  --gold-1:#d4af37;
+  --gold-2:#f6e27a;
+  --gold-3:#b8860b;
+  --dark-1:#0f0f0f;
+  --dark-2:#1a1a1a;
+  --card-bg:rgba(20,20,20,0.85);
+  --border-gold:rgba(212,175,55,0.4);
+}
+
+*{box-sizing:border-box}
+
+body{
+  margin:0;
+  font-family:'Inter',sans-serif;
+  background: radial-gradient(circle at top,#1a1a1a,#000000 70%);
+  color:#fff;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  min-height:100vh;
+  overflow:hidden;
+}
+
+/* Luxury animated gold glow background */
+body::before{
+  content:"";
+  position:absolute;
+  width:600px;
+  height:600px;
+  background:radial-gradient(circle,var(--gold-1),transparent 70%);
+  filter:blur(180px);
+  opacity:0.15;
+  animation: glowMove 8s infinite alternate ease-in-out;
+}
+
+@keyframes glowMove{
+  from{transform:translate(-20%, -20%)}
+  to{transform:translate(20%, 20%)}
+}
+
+.card{
+  position:relative;
+  background:var(--card-bg);
+  padding:3rem 2.5rem;
+  width:90%;
+  max-width:420px;
+  border-radius:28px;
+  backdrop-filter:blur(20px);
+  border:1px solid var(--border-gold);
+  box-shadow:0 0 40px rgba(212,175,55,0.15);
+  text-align:center;
+  z-index:1;
+  transition:0.4s ease;
+}
+
+.card:hover{
+  transform:translateY(-6px);
+  box-shadow:0 0 60px rgba(212,175,55,0.25);
+}
+
+h1{
+  font-family:'Playfair Display',serif;
+  font-size:2.4rem;
+  margin-bottom:0.5rem;
+  background:linear-gradient(45deg,var(--gold-2),var(--gold-1),var(--gold-3));
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+}
+
+h4{
+  color:#bbb;
+  font-weight:400;
+  margin-bottom:2.5rem;
+}
+
+.input-group{
+  margin-bottom:1.6rem;
+  position:relative;
+}
+
+input{
+  width:100%;
+  padding:1rem 1.2rem;
+  border-radius:14px;
+  border:1px solid var(--border-gold);
+  background:#111;
+  color:#fff;
+  font-size:1rem;
+  outline:none;
+  transition:0.3s;
+}
+
+input:focus{
+  border-color:var(--gold-1);
+  box-shadow:0 0 15px rgba(212,175,55,0.4);
+}
+
+input::placeholder{
+  color:#777;
+}
+
+button{
+  width:100%;
+  padding:1rem;
+  border:none;
+  border-radius:14px;
+  font-weight:600;
+  font-size:1rem;
+  cursor:pointer;
+  background:linear-gradient(45deg,var(--gold-3),var(--gold-1),var(--gold-2));
+  color:#000;
+  text-transform:uppercase;
+  letter-spacing:1px;
+  transition:0.3s;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+}
+
+button:hover{
+  transform:translateY(-3px);
+  box-shadow:0 0 25px rgba(212,175,55,0.6);
+}
+
+.footer{
+  margin-top:2rem;
+  font-size:0.85rem;
+}
+
+.footer a{
+  text-decoration:none;
+  color:var(--gold-2);
+  font-weight:600;
+}
+
+.footer a:hover{
+  color:var(--gold-1);
+}
+
+.toast-container{
+  position:fixed;
+  top:20px;
+  right:20px;
+  z-index:9999;
+}
+
+.toast{
+  background:#111;
+  border:1px solid var(--border-gold);
+  padding:12px 20px;
+  border-radius:12px;
+  margin-bottom:10px;
+  color:#fff;
+  box-shadow:0 0 20px rgba(212,175,55,0.3);
+}
+</style>
+</head>
+
+<body>
+
+<div class="card">
+  <h1>Luxury Login</h1>
+  <h4>Access your premium dashboard</h4>
+
+  <div class="input-group">
+    <input type="text" id="number" placeholder="Phone Number">
+  </div>
+
+  <div class="input-group">
+    <input type="password" id="password" placeholder="Password">
+  </div>
+
+  <button onclick="login()" id="loginBtn">
+    <i class="fas fa-sign-in-alt"></i> Login
+  </button>
+
+  <div class="footer">
+    <a href="/">Back to Home</a>
+  </div>
+</div>
+
+<script>
+function showToast(message){
+  const container=document.querySelector('.toast-container')||createContainer();
+  const toast=document.createElement('div');
+  toast.className='toast';
+  toast.innerText=message;
+  container.appendChild(toast);
+  setTimeout(()=>toast.remove(),3000);
+}
+
+function createContainer(){
+  const div=document.createElement('div');
+  div.className='toast-container';
+  document.body.appendChild(div);
+  return div;
+}
+
+async function login(){
+  const number=document.getElementById('number').value;
+  const password=document.getElementById('password').value;
+  const btn=document.getElementById('loginBtn');
+
+  btn.disabled=true;
+  btn.innerHTML='<i class="fas fa-spinner fa-spin"></i> Logging in...';
+
+  try{
+    const res=await fetch('/code/api/login',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({number,password})
+    });
+
+    const data=await res.json();
+
+    if(res.ok){
+      localStorage.setItem('dew_number',number);
+      localStorage.setItem('dew_password',password);
+      showToast("Login Successful");
+      window.location.href='/settings';
+    }else{
+      showToast(data.error||"Login Failed");
+    }
+
+  }catch(e){
+    showToast("Server Error");
+  }finally{
+    btn.disabled=false;
+    btn.innerHTML='<i class="fas fa-sign-in-alt"></i> Login';
+  }
+}
+</script>
+
+</body>
+</html>
