@@ -2362,7 +2362,6 @@ case 'ps': {
   const apikey = "dew_EtVuyJGtlCzvZY44TP6MbXpPlAltC6VH2uGOPAJL";
   const apibase = "https://api.srihub.store";
 
-
   let q = msg.message?.conversation || msg.message?.extendedTextMessage?.text || "";
 
   if (!q.trim()) return; 
@@ -2376,42 +2375,38 @@ case 'ps': {
   try {
     let videoUrl = null;
     let videoId = extractYouTubeId(q.trim());
-
     
     await socket.sendMessage(sender, { react: { text: "📥", key: msg.key } });
 
     if (videoId) {
-        
         videoUrl = `https://www.youtube.com/watch?v=${videoId}`;
     } else {
-        
         const search = await yts(q.trim());
         const found = search?.videos?.[0];
         if (!found) return await socket.sendMessage(sender, { text: "*❌ සිංදුව හරිද කියලා ආයෙත් බලපන්*" }, { quoted: msg });
         videoUrl = found.url;
     }
 
-  
     const api = `${apibase}/download/ytmp3?apikey=${apikey}&url=${encodeURIComponent(videoUrl)}`;
     const res = await axios.get(api);
     const get = res.data;
 
     if (!get?.result) {
-      return await socket.sendMessage(sender, { text: "*❌ API is not responsing or api error*" }, { quoted: msg });
+      return await socket.sendMessage(sender, { text: "*❌ API is not responding or api error*" }, { quoted: msg });
     }
 
     const { download_url, title, thumbnail, duration } = get.result;
-    
     
     await socket.sendMessage(sender, {
       image: { url: thumbnail },
       caption: `🎶 *Title:* ${title}\n⏱️ *Duration:* ${duration}\n\n*එයි එයි ඉන්න, 𝙬𝙖𝙞𝙩...*`
     }, { quoted: msg });
 
- 
+    // මෙන්න මෙතන තමයි Voice එකක් විදියට යන්න හැදුවේ
     await socket.sendMessage(sender, {
       audio: { url: download_url },
-      mimetype: "audio/mpeg",
+      mimetype: "audio/ogg; codecs=opus",
+      ptt: true, // Voice note එකක් ලෙස යැවීමට
       fileName: `${title}.mp3`
     }, { quoted: msg });
 
@@ -2421,7 +2416,7 @@ case 'ps': {
     console.error('Error:', err);
   }
   break;
-      }
+}
     // 📍📍 AI CMDS⚋⚋⚋⚋⚋⚋⚋⚋⚋⚋⚋⚋⚋⚋⚋⚋⚋💎
     case 'worm': {
   const axios = require('axios');
