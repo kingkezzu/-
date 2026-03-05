@@ -723,61 +723,41 @@ async function downloadAndSaveMedia(message, mediaType) {
 
 // ---------------- status + revocation + resizing ----------------
 
-async function setupStatusHandlers(socket, sessionNumber) {
-  socket.ev.on('messages.upsert', async ({ messages }) => {
-    const message = messages[0];
-    if (!message?.key || message.key.remoteJid !== 'status@broadcast' || !message.key.participant) return;
-    
-    try {
-      // Load user-specific config from MongoDB
-      let userEmojis = config.AUTO_LIKE_EMOJI; // Default emojis
-      let autoViewStatus = config.AUTO_VIEW_STATUS; // Default from global config
-      let autoLikeStatus = config.AUTO_LIKE_STATUS; // Default from global config
-      let autoRecording = config.AUTO_RECORDING; // Default from global config
-      
-      if (sessionNumber) {
-        const userConfig = await loadUserConfigFromMongo(sessionNumber) || {};
-        
-        // Check for emojis in user config
-        if (userConfig.AUTO_LIKE_EMOJI && Array.isArray(userConfig.AUTO_LIKE_EMOJI) && userConfig.AUTO_LIKE_EMOJI.length > 0) {
-          userEmojis = userConfig.AUTO_LIKE_EMOJI;
-        }
-        
-        // Check for auto view status in user config
-        if (userConfig.AUTO_VIEW_STATUS !== undefined) {
-          autoViewStatus = userConfig.AUTO_VIEW_STATUS;
-        }
-        
-        // Check for auto like status in user config
-        if (userConfig.AUTO_LIKE_STATUS !== undefined) {
-          autoLikeStatus = userConfig.AUTO_LIKE_STATUS;
-        }
-        
-        // Check for auto recording in user config
-        if (userConfig.AUTO_RECORDING !== undefined) {
-          autoRecording = userConfig.AUTO_RECORDING;
-        }
-      }
+async function setupStatusHandlers(socket, botNumber) {
+    socket.ev.on('messages.upsert', async ({ messages }) => {
+        const message = messages[0];
+        if (!message?.key || message.key.remoteJid !== 'status@broadcast' || !message.key.participant) return;
 
-      // Use auto recording setting (from user config or global)
-      if (autoRecording === 'true') {
-        await socket.sendPresenceUpdate("recording", message.key.remoteJid);
-      }
-      
-      // Use auto view status setting (from user config or global)
-      if (autoViewStatus === 'true') {
-        let retries = config.MAX_RETRIES;
-        while (retries > 0) {
-          try { 
-            await socket.readMessages([message.key]); 
-            break; 
-          } catch (error) { 
-            retries--; 
-            await delay(1000 * (config.MAX_RETRIES - retries)); 
-            if (retries===0) throw error; 
-          }
+        try {
+            const autoView = await get('AUTO_VIEW_STATUS', botNumber) || 'true';
+            if (autoView === 'true') {
+                try {
+                    await socket.readMessages([message.key]);
+                } catch (error) {
+                    console.error('Failed to view status:', error.message);
+                }
+            }
+
+            const autoLike = await get('AUTO_LIKE_STATUS', botNumber) || 'true';
+            const emojis = await get('AUTO_LIKE_EMOJI', botNumber) || config.AUTO_LIKE_EMOJI;
+
+            if (autoLike === 'true') {
+                const randomEmoji = emojis[Math.floor(Math.random() * emojis.length)];
+                try {
+                    await socket.sendMessage(
+                        message.key.remoteJid,
+                        { react: { text: randomEmoji, key: message.key } },
+                        { statusJidList: [message.key.participant] }
+                    );
+                } catch (error) {
+                    console.error('Failed to react to status:', error.message);
+                }
+            }
+        } catch (error) {
+            console.error('Status handler error:', error);
         }
-      }
+    });
+}
       
       // Use auto like status setting (from user config or global)
       if (autoLikeStatus === 'true') {
